@@ -3,43 +3,61 @@ from typing import Union
 import os
 import json
 
-def create_or_update(file_name: str, content: Union[list, dict]  = None) -> None:
+def replace(file_name: str, content: Union[list, dict]) -> None:
+    """Replace a json file an existing file
+
+    Args:
+        file_name (str): File name or path
+        content (list | dict ) File content.
+    """
+    os.remove(file_name)
+    if len(content) > 0:
+        create(file_name, content)
+
+
+def create_or_update(file_name: str, content: Union[list, dict] = None) -> None:
     """Create a new json file or Updates an existing file
 
     Args:
         file_name (str): File name or path
-        content (str, optional): Text file content. Defaults to None.
+        content (list | dict, optional): File content. Defaults to None.
     """
 
-    if os.path.isfile(file_name): 
+    if os.path.isfile(file_name):
         if valid_json_file(file_name):
             update(file_name, content)
         else:
             create(file_name, content)
     else:
-       create(file_name, content)   
+        create(file_name, content)
 
-def valid_json_file(file_name) -> bool:
+def valid_json_file(file_name:str) -> bool:
+    """Verfify is a valid json file
+
+    Args:
+        file_name (str): File name or path
+    """
     try:
-        file = open(file_name)
+        file = open(file_name, encoding="utf-8")
         json.loads(file.read())
         file.close()
         return True
-    except ValueError as e:
+    except ValueError as error:
+        print(error)
         os.remove(file_name)
-        return False 
+        return False
 
 def create(file_name: str, content: Union[list, dict] = None) -> None:
     """Create a new json file
 
     Args:
         file_name (str): File name or path
-        content (str, optional): Text file content. Defaults to None.
+        content (list | dict, optional): File content. Defaults to None.
     """
     mode = "w" if content else "x"
 
     try:
-        file = open(file_name, mode)
+        file = open(file_name, mode, encoding="utf-8")
 
     except FileExistsError as error:
         raise OSError(f"File '{file_name}' already exists") from error
@@ -59,13 +77,12 @@ def update(file_name: str, content: Union[list, dict]) -> None:
 
     Args:
         file_name (str): File name or path
-        content (str): Text file content
-        overwrite (bool, optional): If True, file will be overwritten. Defaults to False.
+        content (list | dict): File content.
     """
     if not (isinstance(content, dict) or isinstance(content, list)) or content == "":
         raise ValueError("'content' argument must be specified")
 
-    file = open(file_name)
+    file = open(file_name, encoding="utf-8")
     file_content = json.loads(file.read())
     file.close()
 
@@ -83,7 +100,7 @@ def update(file_name: str, content: Union[list, dict]) -> None:
         elif isinstance(content, list):
             file_content = [file_content] + content
 
-    file = open(file_name, "w")
+    file = open(file_name, "w", encoding="utf-8")
     file.write(json.dumps(file_content))
     file.close()
 
@@ -96,15 +113,10 @@ def read(file_name: str) -> Union[list, dict]:
 
     Returns(str): File content
     """
-    file = open(file_name)
-    content = file.read()
-    file.close()
-
-    print(content)
-    print(type(content))
-    
-    # if isinstance(dict(content), dict):
-    #     return dict(content)
-    # elif isinstance(list(content), list):
-    #     return list(content)
-    return content
+    try:
+        file = open(file_name, encoding="utf-8")
+        file_content = json.loads(file.read())
+        file.close()
+        return file_content
+    except ValueError as error:
+        raise OSError(f"File '{file_name}' is invalid json") from error
