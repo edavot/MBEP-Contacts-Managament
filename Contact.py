@@ -1,5 +1,6 @@
 """ Contact.py """
 import file
+import uuid
 
 class Contact:
     """Class representing a contact"""
@@ -49,6 +50,8 @@ class Contact:
     def save(self) -> str:
         """Save a contact
         """
+        id = str(uuid.uuid4())
+        print({ id :self.__dict__})
         file.create_or_update(self.FILE_NAME, self.__dict__)
 
     def get_all(self) -> list:

@@ -55,7 +55,7 @@ def add_contact():
     ciudad = input_message("Ingresa la ciudad: ")
     estado = input_message("Ingresa el estado: ")
     pais = input_message("Ingresa el pais: ")
-    id_contact = Contact(
+    Contact(
         nombre,
         apellido,
         telefono,
@@ -69,7 +69,6 @@ def add_contact():
         pais,
         num_int,
     ).save()
-    print(f'Se agrego el contacto: {id_contact}')
 
 def search_contact():
     """Search contact"""
@@ -78,7 +77,7 @@ def search_contact():
     if len(contact) == 0:
         print('No se encontraron coincidencias con los datos ingresados')
         return
-    print(contact)
+    print_contacts(contact)
 
 def delete_contact():
     """Delete contact"""
@@ -87,7 +86,7 @@ def delete_contact():
 
 def list_contacts():
     """List of contacts"""
-    print(f" \n{Contact('','','','','','','','','','','').get_all()}")
+    print_contacts(Contact('','','','','','','','','','','').get_all())
 
 def count_contacts():
     """Number of contacts"""
@@ -99,8 +98,8 @@ def slice_contacts():
     """Number of contacts"""
     lenght = ''
     while not lenght.isnumeric():
-        lenght = input_message("Ingresa el numero de contactos a mostrar: ")
-    print(f" \n{Contact('','','','','','','','','','','').slice(int(lenght))}")
+        lenght = input_message("Ingresa el numero de contactos a mostrar: ")       
+    print_contacts(Contact('','','','','','','','','','','').slice(int(lenght)))
 
 def return_menu():
     """Return to principal menu"""
@@ -126,5 +125,16 @@ def input_message(message: str, required: bool = True) -> str:
     else:
         value = input(message)
     return value
+
+def print_contacts(contacts: list):
+    """Print list to contacts
+
+    Args:
+        contacts (list): List of contacts.
+    """
+    for contact in contacts:
+        for key, value in contact.items():
+            print(f"{str(key).capitalize().replace('_', ' ')}: {value}")
+        print(" \n")
 
 show_menu()
